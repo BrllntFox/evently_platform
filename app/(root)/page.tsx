@@ -10,7 +10,7 @@ export default function Home() {
           <div className="flex flex-col justify-center gap-8">
             <h1 className="h1-bold">Host, create your Events!</h1>
             <p className="p-regular-20 md:p-regular-24">
-            Let`&apos;&quot;`s have some fun with your events
+            Let&apos;s have some fun with your events
             </p>
             <Button size={'lg'} asChild className='button w-full sm:w-fit'>
               <Link href={'#events'}>Explore Now</Link>
