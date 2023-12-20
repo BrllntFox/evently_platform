@@ -1,8 +1,6 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-
-
 import { handleError } from '@/lib/utils'
 import { CreateUserParams, UpdateUserParams } from '../types'
 import { connectToDatabase } from '../mongodb/database'
