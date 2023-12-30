@@ -1,5 +1,5 @@
 "use client";
-import React, { startTransition } from "react";
+import React, { startTransition, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -21,6 +21,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "../ui/input";
+import { createCategory, getAllCategories } from "@/lib/actions/category.action";
 
 type DropdownProps = {
   value: string;
@@ -33,8 +34,21 @@ const Dropdown = ({ value, onChangeHandler }: DropdownProps) => {
   ]);
   const [newCategory, setNewCategory] = useState('')
 
-  const handleAddCategory = () => {}
-
+  const handleAddCategory = () => {
+    createCategory({
+      categoryName:newCategory.trim()
+    })
+    .then((category) => {
+      setCategories((prevState)=>[...prevState,category])
+    })
+  }
+  useEffect(()=>{
+    const getCategories = async() => {
+      const categoriesList = await getAllCategories()
+      categoriesList && setCategories(categoriesList as ICategory[])
+  }
+  getCategories()
+},  [])
   return (
     <Select onValueChange={onChangeHandler} defaultValue={value}>
       <SelectTrigger className="select-field">
