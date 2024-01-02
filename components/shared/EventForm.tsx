@@ -23,26 +23,55 @@ import Image from "next/image";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Checkbox } from "../ui/checkbox";
+import {useUploadThing} from  '@/lib/uploadthing'
+import { useRouter } from "next/navigation";
+import { createEvent } from "@/lib/actions/event.actions";
 
 type EventFormProps = {
   userId: string;
   type: "Create" | "Update";
 };
 
-function onSubmit(values: z.infer<typeof eventFormSchema>) {
-  // Do something with the form values.
-  // ✅ This will be type-safe and validated.
-  console.log(values);
-}
+
+
 
 const EventForm = ({ userId, type }: EventFormProps) => {
   const [files, setFiles] = React.useState<File[]>([]);
   const initialValues = eventDefaultValues;
+  const {startUpload} = useUploadThing('imageUploader');
+  const router = useRouter()
 
   const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema),
     defaultValues: initialValues,
   });
+  async function onSubmit(values: z.infer<typeof eventFormSchema>) {
+    // Do something with the form values.
+    // ✅ This will be type-safe and validated.
+    let uploadedImageUrl = values.image_Url;
+    if (files.length > 0) {
+      const uploadedImages = await startUpload(files)
+      if (!uploadedImages) {
+        return
+      }
+      uploadedImageUrl = uploadedImages[0].url
+    }
+    if (type === 'Create') {
+      try {
+        const newEvent = await createEvent({
+          event: {...values,imageUrl:uploadedImageUrl},
+          userId,
+        path:'/profile'}
+        )
+        if (newEvent) {
+          form.reset();
+          router.push(`/events/${newEvent._id}`)
+        }
+      } catch (error) {
+        console.log(error) + 'error on create event'
+      }
+    }
+  }
   return (
     <Form {...form}>
       <form
@@ -81,7 +110,7 @@ const EventForm = ({ userId, type }: EventFormProps) => {
               <FormItem className="w-full">
                 <FormLabel>Event category</FormLabel>
                 <FormControl>
-                  <Dropdown value="1" onChangeHandler={() => {}} />
+                  <Dropdown value={field.value} onChangeHandler={field.onChange} />
                 </FormControl>
                 <FormDescription>
                   Let audience search on your events&apos; category.{" "}
