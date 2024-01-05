@@ -79,3 +79,13 @@ export async function deleteUser(clerkId: string) {
     handleError(error)
   }
 }
+
+export async function getAllUsers()  {
+  try {
+await connectToDatabase();
+const users = User.find({});
+return users
+  } catch (error) {
+    handleError(error)
+  }
+}
